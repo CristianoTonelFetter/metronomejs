@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="css/index.css">
+    
+    <title>Metronome</title>
+</head>
+<body>
+    <main class="metronome">
+        <div id="display" class="display">0</div>
+        <div class="form-group">
+            <label class="control">
+                <span class="control__label">Bpm</span>
+                <input type="number" id="bpm" value="120" step="1" min="0" max="1000" class="field">
+            </label>
+        </div>
+        <div class="form-group">
+            <label for="unit" class="control__label">Time signature</label>
+            <div class="time-signature">
+                <input type="text" value="4" id="unit" class="field">
+                <span>/</span>
+                <select id="figure" class="field">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4" selected>4</option>
+                    <option value="8">8</option>
+                    <!--
+                        <option value="16">16</option>
+                        <option value="32">32</option>
+                        <option value="64">64</option>
+                    -->
+                </select>
+            </div>
+        </div>
+        <div class="button-bar">
+            <button id="stop" class="button">Stop</button>
+            <button id="start" class="button">Start</button>
+        </div>
+    </main>
+
+    <script src="js/index.js"></script>
+</body>
+</html>

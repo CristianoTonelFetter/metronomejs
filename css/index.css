@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+body, html {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.metronome {
+    padding: 20px;
+    display: flex;
+    justify-items: center;
+    flex-direction: column;
+}
+
+.display {
+    display: flex;
+    justify-items: center;
+    flex-direction: row;
+    align-items: center;
+    height: 42px;
+    font-size: 32px;
+    margin-bottom: 20px;
+    background-color: #eeeeee;
+    padding: 0 10px;
+}
+
+.control {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.control__label {
+    margin-bottom: 5px;
+    display: block;
+}
+
+.field {
+    border: 1px solid #000000;
+    padding: 0 10px;
+    height: 42px;
+    width: 100%;
+}
+
+.time-signature {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 22px;
+}
+
+.time-signature span {
+    display: block;
+    padding: 0 10px;
+}
+
+.button {
+    height: 42px;
+    border: 1px solid #000000;
+    width: 100%;
+    padding: 0 20px;
+    background-color: #eeeeee;
+}
+
+.button-bar {
+    display: flex;
+    flex-direction: row;
+}
+
+.button-bar .button {
+    margin: 0 10px;
+}
+
+.button-bar .button:first-child {
+    margin-left: 0;
+}
+
+.button-bar .button:last-child {
+    margin-right: 0;
+}
