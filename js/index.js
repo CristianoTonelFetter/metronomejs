@@ -2,12 +2,8 @@ function Metronome(options) {
     this.step = () => {
         this.interval = this.getInterval();
         let expected = Date.now() + this.interval;
-        const drift = Math.max(0, Date.now() - expected); // the drift (positive for overshooting)
-
-        // if (drift > this.interval) {
-            // something really bad happened. Maybe the browser (tab) was inactive?
-            // possibly special handling to avoid futile "catch up" run
-        // }
+        // the drift (positive for overshooting)
+        const drift = Math.max(0, Date.now() - expected);
 
         expected += this.interval;
 
@@ -19,7 +15,8 @@ function Metronome(options) {
         
         this.sound.play();
 
-        this.loop = setTimeout(this.step, Math.max(0, this.interval - drift)); // take into account drift
+        // take drift into account
+        this.loop = setTimeout(this.step, Math.max(0, this.interval - drift));
         
         this.display.innerHTML = this.count;
         this.count = this.count < parseInt(this.signature.unit.value) ? this.count + 1 : 1;
@@ -32,6 +29,10 @@ function Metronome(options) {
 
         if (this.loop) {
             this.stop();
+        }
+
+        if (this.preCount.checked) {
+
         }
 
         this.count = 1;
@@ -60,6 +61,7 @@ function Metronome(options) {
     
         this.display = document.querySelector(options.selector.display);
         this.bpm = document.querySelector(options.selector.bpm);
+        this.preCount = document.querySelector(options.selector.preCount);
     }
 
     this.onChangeBpm = (event) => {
@@ -72,10 +74,16 @@ function Metronome(options) {
             this.start();
         }
     }
+
+    this.onChangePreCount = (event) => {
+        
+    }
+
     this.attachEvents = () => {
         this.button.start.addEventListener('click', this.start);
         this.button.stop.addEventListener('click', this.stop);
         this.bpm.addEventListener('input', this.onChangeBpm);
+        this.preCount.addEventListener('input', this.onChangePreCount);
     }
 
     this.config = () => {
@@ -115,7 +123,8 @@ const metronome = new Metronome({
             unit: '#unit',
             figure: '#display'
         },
-        bpm: '#bpm'
+        bpm: '#bpm',
+        preCount: '#preCount'
     },
     click: {
         sound: {

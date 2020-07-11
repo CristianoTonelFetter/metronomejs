@@ -35,17 +35,25 @@ body {
     padding: 0 10px;
 }
 
-.control {
-    margin-bottom: 20px;
-}
-
 .form-group {
     margin-bottom: 20px;
 }
 
+.form-group__label,
 .control__label {
     margin-bottom: 5px;
     display: block;
+}
+
+.control--checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.control--checkbox .checkbox {
+    margin-right: 10px;
 }
 
 .field {
