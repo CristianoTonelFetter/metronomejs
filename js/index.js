@@ -1,4 +1,6 @@
 function Metronome(options) {
+    this.preCountIsActive = () => this.preCount.checked;
+
     this.step = () => {
         this.interval = this.getInterval();
         let expected = Date.now() + this.interval;
@@ -7,7 +9,11 @@ function Metronome(options) {
 
         expected += this.interval;
 
-        if (this.count === 1) {
+        const preCounting = this.preCountIsActive() && this.preCountBeat <= this.signature.unit.value;
+
+        if (preCounting) {
+            this.sound = new Audio(options.click.sound.preCount);
+        } else if (this.count === 1) {
             this.sound = new Audio(options.click.sound.up);
         } else {
             this.sound = new Audio(options.click.sound.down);
@@ -18,8 +24,13 @@ function Metronome(options) {
         // take drift into account
         this.loop = setTimeout(this.step, Math.max(0, this.interval - drift));
         
-        this.display.innerHTML = this.count;
-        this.count = this.count < parseInt(this.signature.unit.value) ? this.count + 1 : 1;
+        this.display.innerHTML = preCounting ? `/ ${this.preCountBeat}` : this.count;
+
+        if (preCounting) {
+            ++this.preCountBeat;
+        } else {
+            this.count = this.count < parseInt(this.signature.unit.value) ? this.count + 1 : 1;
+        }
     }
 
     this.start = () => {
@@ -31,8 +42,8 @@ function Metronome(options) {
             this.stop();
         }
 
-        if (this.preCount.checked) {
-
+        if (this.preCountIsActive()) {
+            this.preCountBeat = 1;
         }
 
         this.count = 1;
@@ -87,23 +98,25 @@ function Metronome(options) {
     }
 
     this.config = () => {
+        this.started = false;
+        this.preCountBeat = 0;
         this.count = 0;
         this.seconds = 60;
         this.miliseconds = 1000;
     }
 
-    this.loadSounds = () => {
+    this.preLoadSounds = () => {
         // not sure if this helps
         new Audio(options.click.sound.up);
         new Audio(options.click.sound.down);
+        new Audio(options.click.sound.preCount);
     }
     
     this.init = () => {
-        this.started = false;
         this.config();
         this.elements();
         this.attachEvents();
-        this.loadSounds();
+        this.preLoadSounds();
     }
 
     return {
@@ -129,7 +142,8 @@ const metronome = new Metronome({
     click: {
         sound: {
             up: 'sound/clickUp.wav',
-            down: 'sound/clickDown.wav'
+            down: 'sound/clickDown.wav',
+            preCount: 'sound/preCount.wav'
         }
     }
 });
