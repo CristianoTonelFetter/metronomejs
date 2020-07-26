@@ -10,15 +10,17 @@ function Metronome(options) {
         expected += this.interval;
 
         const preCounting = this.preCountIsActive() && this.preCountBeat <= this.signature.unit.value;
+        let clickSound;
 
         if (preCounting) {
-            this.sound = new Audio(options.click.sound.preCount);
+            clickSound = options.click.sound.preCount;
         } else if (this.count === 1) {
-            this.sound = new Audio(options.click.sound.up);
+            clickSound = options.click.sound.up;
         } else {
-            this.sound = new Audio(options.click.sound.down);
+            clickSound = options.click.sound.down;
         }
         
+        this.sound = new Audio(clickSound);
         this.sound.play();
 
         // take drift into account
@@ -57,12 +59,38 @@ function Metronome(options) {
         this.started = false;
     }
 
+    this.tap = () => {
+        if (this.tapDebounce) {
+            clearTimeout(this.tapDebounce);
+        }
+
+        const tapTime = new Date().getTime();
+
+        this.tapTimes.push(tapTime);
+
+        const { length: taps } = this.tapTimes;
+
+        if (taps > 1) {
+            this.tapDifferences.push(this.tapTimes[taps - 1] - this.tapTimes[taps - 2]);
+            const average = this.tapDifferences.reduce((acc, item) => acc + item, 0) / this.tapDifferences.length;
+
+            // this is weird but works
+            this.bpm.value = Math.floor(this.seconds * (this.seconds / (this.seconds * (average / this.miliseconds))));
+        }
+        
+        this.tapDebounce = setTimeout(() => {
+            this.tapTimes = [];
+            this.tapDifferences = [];
+        }, this.miliseconds * 2);
+    }
+
     this.getInterval = () => (this.miliseconds / parseInt(this.bpm.value)) * this.seconds;
 
     this.elements = () => {
         this.button = {
             start: document.querySelector(options.selector.start),
-            stop: document.querySelector(options.selector.stop)
+            stop: document.querySelector(options.selector.stop),
+            tap: document.querySelector(options.selector.tap)
         };
     
         this.signature = {
@@ -86,13 +114,10 @@ function Metronome(options) {
         }
     }
 
-    this.onChangePreCount = (event) => {
-        
-    }
-
     this.attachEvents = () => {
         this.button.start.addEventListener('click', this.start);
         this.button.stop.addEventListener('click', this.stop);
+        this.button.tap.addEventListener('click', this.tap);
         this.bpm.addEventListener('input', this.onChangeBpm);
         this.preCount.addEventListener('input', this.onChangePreCount);
     }
@@ -101,6 +126,8 @@ function Metronome(options) {
         this.started = false;
         this.preCountBeat = 0;
         this.count = 0;
+        this.tapTimes = [];
+        this.tapDifferences = [];
         this.seconds = 60;
         this.miliseconds = 1000;
     }
@@ -137,7 +164,8 @@ const metronome = new Metronome({
             figure: '#display'
         },
         bpm: '#bpm',
-        preCount: '#preCount'
+        preCount: '#preCount',
+        tap: '#tap'
     },
     click: {
         sound: {
