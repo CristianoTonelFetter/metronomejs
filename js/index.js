@@ -1,18 +1,15 @@
 function Metronome(options) {
     this.preCountIsActive = () => this.preCount.checked;
 
+    this.updateDisplay = () => {
+        this.display.innerHTML = this.preCounting ? `/ ${this.preCountBeat}` : this.count;
+    }
+
     this.step = () => {
-        this.interval = this.getInterval();
-        let expected = Date.now() + this.interval;
-        // the drift (positive for overshooting)
-        const drift = Math.max(0, Date.now() - expected);
-
-        expected += this.interval;
-
-        const preCounting = this.preCountIsActive() && this.preCountBeat <= this.signature.unit.value;
+        this.preCounting = this.preCountIsActive() && this.preCountBeat <= this.signature.unit.value;
         let clickSound;
 
-        if (preCounting) {
+        if (this.preCounting) {
             clickSound = options.click.sound.preCount;
         } else if (this.count === 1) {
             clickSound = options.click.sound.up;
@@ -23,16 +20,21 @@ function Metronome(options) {
         this.sound = new Audio(clickSound);
         this.sound.play();
 
-        // take drift into account
-        this.loop = setTimeout(this.step, Math.max(0, this.interval - drift));
+        this.updateDisplay();
         
-        this.display.innerHTML = preCounting ? `/ ${this.preCountBeat}` : this.count;
-
-        if (preCounting) {
+        if (this.preCounting) {
             ++this.preCountBeat;
         } else {
             this.count = this.count < parseInt(this.signature.unit.value) ? this.count + 1 : 1;
         }
+
+        // the drift (positive for overshooting)
+        const drift = Math.max(0, Date.now() - this.expected);
+        
+        this.expected += this.interval;
+
+        // take drift into account
+        this.loop = setTimeout(this.step, Math.max(0, this.interval - drift));
     }
 
     this.start = () => {
@@ -48,8 +50,9 @@ function Metronome(options) {
             this.preCountBeat = 1;
         }
 
-        this.count = 1;
         this.interval = this.getInterval();
+        this.expected = Date.now() + this.interval;
+        this.count = 1;
         this.loop = setTimeout(this.step, this.interval);
         this.started = true;
     }
@@ -131,19 +134,11 @@ function Metronome(options) {
         this.seconds = 60;
         this.miliseconds = 1000;
     }
-
-    this.preLoadSounds = () => {
-        // not sure if this helps
-        new Audio(options.click.sound.up);
-        new Audio(options.click.sound.down);
-        new Audio(options.click.sound.preCount);
-    }
     
     this.init = () => {
         this.config();
         this.elements();
         this.attachEvents();
-        this.preLoadSounds();
     }
 
     return {
