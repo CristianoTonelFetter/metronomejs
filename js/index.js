@@ -62,6 +62,13 @@ function Metronome(options) {
         this.started = false;
     }
 
+    this.restart = () => {
+        if (this.started) {
+            this.stop();
+            this.start();
+        }
+    }
+
     this.tap = () => {
         if (this.tapDebounce) {
             clearTimeout(this.tapDebounce);
@@ -84,6 +91,8 @@ function Metronome(options) {
         this.tapDebounce = setTimeout(() => {
             this.tapTimes = [];
             this.tapDifferences = [];
+
+            this.restart();
         }, this.miliseconds * 2);
     }
 
@@ -111,10 +120,11 @@ function Metronome(options) {
             event.target.value = 0;
         }
 
-        if (this.started) {
-            this.stop();
-            this.start();
-        }
+        this.restart();
+    }
+
+    this.onChangePreCount = () => {
+        this.restart();
     }
 
     this.attachEvents = () => {
